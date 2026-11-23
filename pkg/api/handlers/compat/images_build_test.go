@@ -8,13 +8,15 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"go.podman.io/podman/v6/version"
 )
 
 func TestCreateBuildOptionsUsesServerTmpDir(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("TMPDIR", tmpDir)
 
-	for _, path := range []string{"/v1.41/build", "/v6.0.0/libpod/build"} {
+	apiVersion := version.APIVersion[version.Libpod][version.CurrentAPI].FinalizeVersion()
+	for _, path := range []string{"/build", "/v" + apiVersion + "/libpod/build"} {
 		t.Run(path, func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodPost, path, nil)
 			options, cleanup, err := createBuildOptions(&BuildQuery{}, &BuildContext{}, nil, request)
